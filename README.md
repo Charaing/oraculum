@@ -81,3 +81,15 @@ AI 입력은 정규화한 계산 스냅샷과 자체 규칙 해설입니다. 질
 20 automated tests now pass, including route-level SQLite isolation and disk persistence checks. Hosted D1 and browser end-to-end checks remain unverified due environment restrictions. Native deployment was attempted but failed at source-host DNS resolution. There is no live URL for this delivery. See docs/verification-20261104.md for exact evidence and limitations.
 
 Guest save attempts hold a validated snapshot in tab sessionStorage for up to 30 minutes across login; this is an explicitly disclosed temporary draft, not the permanent record store. Pending data is removed on successful save. Minimal per-user request-rate metadata is retained separately from reading deletion to prevent quota-reset abuse.
+
+## Cloudflare 배포 (self-hosted)
+
+라이브: https://oraculum.suupeopiwosu.workers.dev
+
+```sh
+D1_DATABASE_NAME=oraculum-db D1_DATABASE_ID=<d1-id> npm run build
+npx wrangler d1 execute oraculum-db --remote --config dist/server/wrangler.json --file drizzle/0000_chief_susan_delgado.sql
+npx wrangler deploy --config dist/server/wrangler.json
+```
+
+이 배포에는 ChatGPT 로그인 프록시가 없어서 Worker가 클라이언트가 보낸 `oai-authenticated-*` 헤더를 지웁니다. 그래서 로그인 없이 쓰는 기능만 작동하고, 기록 저장은 별도 인증을 붙여야 작동합니다.

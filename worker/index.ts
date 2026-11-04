@@ -23,6 +23,15 @@ const worker = {
         },
       };
     }
+    // Self-hosted deploys have no trusted auth proxy: never trust client-sent
+    // identity headers, otherwise anyone could impersonate any user ID.
+    if (!import.meta.env.DEV) {
+      const clean = new Headers(request.headers);
+      for (const name of [...clean.keys()]) {
+        if (name.toLowerCase().startsWith("oai-authenticated-")) clean.delete(name);
+      }
+      request = new Request(request, { headers: clean });
+    }
     return runWithConnectorBinding(binding, () => handler.fetch(request, env, ctx));
   },
 };
